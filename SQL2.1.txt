@@ -1,0 +1,120 @@
+CREATE TABLE DISCO (
+    NroSerie FLOAT NOT NULL,
+    TitoloAlbum TEXT (100),
+    Anno DOUBLE,
+    Prezzo TEXT (100)
+);
+
+INSERT INTO DISCO (NroSerie, TitoloAlbum, Anno, Prezzo) VALUES
+    (1, 'Suonare', 2020, '15€'),
+    (2, 'Volare', 2015, '25€'),
+    (3, 'Sale', NULL, '10€');
+
+CREATE TABLE CONTIENE (
+    NroSerieDisco FLOAT NOT NULL,
+    CodiceReg FLOAT NOT NULL,
+    NroProg FLOAT PRIMARY KEY
+);
+
+INSERT INTO CONTIENE (NroSerieDisco, CodiceReg, NroProg) VALUES
+    (33, 4400,1),
+    (5, 3300, 2),
+    (7, 5500, 3);
+
+CREATE TABLE ESECUZIONE (
+    CodiceReg DOUBLE,
+    TitoloCanz TEXT (100) NOT NULL,
+    Anno DOUBLE
+);
+
+INSERT INTO ESECUZIONE (CodiceReg, TitoloCanz, Anno) VALUES
+    (4400, 'Blù', 2020),
+    (3300, 'Dipinto', 2015),
+    (5500, 'Sapore', NULL);
+
+CREATE TABLE AUTORE (
+    Nome TEXT (100),
+    TitoloCanz TEXT (100) NOT NULL,
+    Anno DOUBLE 
+);
+INSERT INTO AUTORE (Nome, TitoloCanz, Anno) VALUES
+    ("Daniele","Blù", 2020),
+    ("Modugno", "Dipinto", 2015),
+    ("Paoli", "Sapore", NULL);
+-- create a table
+CREATE TABLE CANTANTE (
+    NomeCantante TEXT(100) NOT NULL,
+    CodiceReg FLOAT NOT NULL
+);
+
+INSERT INTO CANTANTE (NomeCantante, CodiceReg) VALUES
+("Daniele", 4400 ),
+("Modugno", 3300),
+("Gino", 5500);
+
+#SCRITTO E CANTATO  D
+SELECT A.Nome  FROM AUTORE A JOIN ESECUZIONE E ON A.TitoloCanz = E.TitoloCanz WHERE A.Nome LIKE "%D%";
+#I titoli dei dischi che contengono canzoni di cui non si conosce l'anno di registrazione;
+SELECT D.TitoloAlbum FROM DISCO D JOIN CONTIENE C ON D.NroSerie = C.NroProg JOIN ESECUZIONE E ON C.CodiceReg = E.CodiceReg WHERE D.Anno IS NULL; 
+#I cantanti che hanno sempre registrato canzoni come solisti.
+
+#STUDENTE(Matricola, Nome, Citta)      
+#CORSO(Codice, Nome, MatricolaDocente)      
+#DOCENTE(Matricola, Nome)      
+#ESAME(Codice, MatricolaStudente, Data, Voto, SettoreScientifico) 
+
+CREATE TABLE STUDENTE (
+    Matricola FLOAT,
+    Nome TEXT (50),
+    Citta TEXT (50)
+);
+CREATE TABLE CORSO (
+    Codice FLOAT,
+    Nome TEXT (50),
+    MatricolaDocente FLOAT
+
+    );
+CREATE TABLE DOCENTE (
+    Matricola FLOAT NOT NULL,
+    Nome TEXT (50) NOT NULL
+);
+
+CREATE TABLE ESAME (
+    Codice FLOAT NOT NULL,
+    MatricolaStudente FLOAT,
+    Data DATE,
+    Voto FLOAT,
+    SettoreScientifico TEXT(50) 
+    );
+
+INSERT INTO STUDENTE (Matricola,Nome, Citta) VALUES
+    (1577, "Luca", "Parma"),
+    (2766, 'Giovanni',"Genova"),
+    (2299, "Martina", "Mantova");
+INSERT INTO CORSO (Codice, Nome, MatricolaDocente) VALUES
+(1, "MATEMATICA", 3300),
+(2, "GEOMETRIA", 4400),  
+(3, "SCIENZA", 5500);
+INSERT INTO DOCENTE (Matricola, Nome) VALUES
+(3300, "GIACOMO"),
+(4400, "FRANCESCO"),
+(5500, "ANNA");
+INSERT INTO ESAME (Codice, MatricolaStudente, Data, Voto, SettoreScientifico) VALUES
+(6600, 1577, "2023-01-20",26,"MATEMATICA"),
+(7700, 2766, "2023-05-08",29,"GEOMETRIA"),
+(8800, 2299, "2023-09-30",30,"SCIENZA");
+
+SELECT E.MatricolaStudente, C.Nome, D.Nome
+FROM ESAME E JOIN CORSO C ON E.SettoreScientifico = C.Nome JOIN DOCENTE D ON C.MatricolaDocente = D.Matricola WHERE E.Voto > 28;
+#SELECT Docente Nome, Nome Materia, SettoreScientifico
+#FROM DOCENTE D JOIN CORSO C JOIN ESAME E
+SELECT D.Nome, C.Nome, E.SettoreScientifico
+FROM DOCENTE D JOIN CORSO C ON D.Matricola = C.MatricolaDocente
+JOIN ESAME E ON C.Nome = E.SettoreScientifico;
+#Visualizzare per ogni studente la matricola, il nome, il voto massimo, minimo e medio conseguito negli esami 
+#Visualizzare - per ogni studente con media voti maggiore di 25 e che ha sostenuto esami in almeno 10 date
+#la matricola, il nome, il voto massimo, minimo e medio conseguito negli esami. Ordinare per voto.
+SELECT S.Matricola, S.Nome, MAX(E.Voto) AS VotoMigliore, MIN(E.Voto) AS VotoPeggiore, AVG(E.Voto) AS VotoMedio
+FROM STUDENTE S JOIN ESAME E ON S.Matricola = E.MatricolaStudente GROUP BY S.Matricola, S.Nome 
+HAVING AVG(E.Voto) > 25  ORDER BY VotoMedio DESC;
+
